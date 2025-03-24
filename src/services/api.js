@@ -423,4 +423,47 @@ export const checkAccountType = async () => {
   return api.get("/member/account-type");
 };
 
+// 건강기능식품 검색 API
+export const searchHealthFoods = async (keyword, page = 1, limit = 10) => {
+  return api.get(`/health-foods/search?keyword=${encodeURIComponent(keyword)}&pageNo=${page}&numOfRows=${limit}`);
+};
+
+// 건강기능식품 상세 조회 API
+export const getHealthFoodDetail = async (reportNo) => {
+  return api.get(`/health-foods/detail/${encodeURIComponent(reportNo)}`);
+};
+
+// 간편 검색 API
+export const quickSearchHealthFoods = async (productName) => {
+  return api.get(`/health-foods/quick-search?name=${encodeURIComponent(productName)}`);
+};
+
+// 제품 정보 조회 API (기존 함수를 확장)
+export const getProductDetailWithHealth = async (productId) => {
+  try {
+    // 먼저 제품 기본 정보 조회
+    const productResponse = await api.get(`/products/${productId}`);
+    
+    // 제품 정보에 신고번호가 있으면, 건강기능식품 API도 조회
+    if (productResponse.data?.data?.registrationNo) {
+      try {
+        const healthResponse = await getHealthFoodDetail(productResponse.data.data.registrationNo);
+        // 두 정보 병합
+        return {
+          ...productResponse.data,
+          healthInfo: healthResponse.data?.data
+        };
+      } catch (healthError) {
+        console.warn('건강기능식품 정보 조회 실패:', healthError);
+        return productResponse.data;
+      }
+    }
+    
+    return productResponse.data;
+  } catch (error) {
+    console.error('제품 정보 조회 실패:', error);
+    throw error;
+  }
+};
+
 export default api;
