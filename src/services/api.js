@@ -405,10 +405,17 @@ export const increaseReviewView = async (reviewId) => {
   return api.post(`/reviews/${reviewId}`);
 };
 
-export const searchProducts = async (keyword) => {
-  return api.get(`/reviews/products/search`, {
-    params: { keyword }
-  });
+// 제품 검색 API
+export const searchProducts = (keyword) => {
+  const encodedKeyword = encodeURIComponent(keyword);
+  // 캐싱 방지를 위한 타임스탬프 추가
+  const timestamp = new Date().getTime();
+  return api.get(`/products/search?keyword=${encodedKeyword}&_=${timestamp}`);
+};
+
+// 제품 상세 조회 API
+export const getProductById = (productId) => {
+  return api.get(`/products/${productId}`);
 };
 
 // 사용자 계정 유형 확인 API (소셜 계정 여부)

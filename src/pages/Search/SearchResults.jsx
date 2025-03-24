@@ -4,6 +4,7 @@ import { useLocation, useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import Header from '../../components/include/Header';
 import Footer from '../../components/include/Footer';
+import { searchProducts } from '../../services/api';
 
 const SearchResults = () => {
   const location = useLocation();
@@ -30,17 +31,14 @@ const SearchResults = () => {
 
       setLoading(true);
       try {
-        // 공공 데이터 API 호출
-        const response = await axios.get('http://localhost:8000/api/products/search', {
-          params: {
-            keyword: query
-          }
-        });
+        // 검색 API 호출 (services/api.js에서 정의한 함수 사용)
+        const response = await searchProducts(query);
 
         if (response.data && response.data.success) {
           setSearchResults(response.data.data);
         } else {
           setSearchResults([]);
+          setError(response.data?.message || '검색 결과가 없습니다.');
         }
 
         // 로그인 상태라면 즐겨찾기 목록도 조회
